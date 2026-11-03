@@ -23,13 +23,12 @@ def check_dependencies() -> list[str]:
     return missing
 
 
-def ensure_dependencies() -> None:
-    missing = check_dependencies()
-    if missing:
-        print(f"\nMissing: {', '.join(missing)}")
-        print("Install with pip:    pip install -r requirements.txt")
-        print("Install with Poetry: poetry install")
-        sys.exit(1)
+def compare_managers() -> None:
+    print("\npip vs Poetry:")
+    print("pip:    requirements.txt, no lock file")
+    print("Poetry: pyproject.toml + poetry.lock, reproducible")
+    manager = "Poetry" if "pypoetry" in sys.prefix else "pip/venv"
+    print(f"Running in: {manager} ({sys.prefix})")
 
 
 def analyze_and_plot() -> None:
@@ -39,9 +38,8 @@ def analyze_and_plot() -> None:
     matplotlib.use("Agg")
     plt = importlib.import_module("matplotlib.pyplot")
 
-    data = np.random.normal(size=1000)
-    df = pd.DataFrame({"signal": data})
-    print("Analyzing Matrix data...")
+    df = pd.DataFrame({"signal": np.random.normal(size=1000)})
+    print("\nAnalyzing Matrix data...")
     print(f"Processing {len(df)} data points...")
     print("Generating visualization...")
     plt.plot(df["signal"])
@@ -52,9 +50,14 @@ def analyze_and_plot() -> None:
 
 def main() -> None:
     print("LOADING STATUS: Loading programs...\n")
-    ensure_dependencies()
-    print()
+    missing = check_dependencies()
+    if missing:
+        print(f"\nMissing: {', '.join(missing)}")
+        print("pip:    pip install -r requirements.txt")
+        print("Poetry: poetry install")
+        sys.exit(1)
     analyze_and_plot()
+    compare_managers()
 
 
 if __name__ == "__main__":
